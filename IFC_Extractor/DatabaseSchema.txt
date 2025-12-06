@@ -1,0 +1,81 @@
+CREATE TABLE ifc_file (
+    id SERIAL PRIMARY KEY,
+    guid UUID NOT NULL,
+    file_name TEXT NOT NULL,
+    project_name TEXT,
+    schema_version TEXT,
+    uploaded_at TIMESTAMP DEFAULT NOW(),
+    version INT DEFAULT 1
+);
+
+CREATE TABLE ifc_element (
+    id SERIAL PRIMARY KEY,
+    file_id INT REFERENCES ifc_file(id) ON DELETE CASCADE,
+    global_id TEXT NOT NULL,
+    ifc_class TEXT NOT NULL,              -- e.g. IfcWall
+    name TEXT,
+    description TEXT,
+    type_name TEXT,                       -- IfcTypeObject
+    parent_global_id TEXT,                -- hubungan spatial
+    created TIMESTAMP DEFAULT NOW(),
+    UNIQUE (file_id, global_id)
+);
+
+CREATE TABLE ifc_geometry (
+    id SERIAL PRIMARY KEY,
+    element_id INT REFERENCES ifc_element(id) ON DELETE CASCADE,
+    geom GEOMETRY,
+    bbox GEOMETRY,                        -- bounding box (optional)
+    representation_type TEXT,             -- IfcFacetedBrep, IfcExtrudedAreaSolid, dll
+    triangulated BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE ifc_property (
+    id SERIAL PRIMARY KEY,
+    element_id INT REFERENCES ifc_element(id) ON DELETE CASCADE,
+    property_set TEXT,                    -- misal: Pset_WallCommon
+    property_name TEXT,
+    property_value TEXT
+);
+
+
+CREATE TABLE ifc_quantity (
+    id SERIAL PRIMARY KEY,
+    element_id INT REFERENCES ifc_element(id) ON DELETE CASCADE,
+    quantity_name TEXT,                   -- e.g. NetVolume
+    quantity_type TEXT,                   -- REAL / AREA / VOLUME
+    quantity_value DOUBLE PRECISION
+);
+
+CREATE TABLE ifc_spatial_structure (
+    id SERIAL PRIMARY KEY,
+    file_id INT REFERENCES ifc_file(id),
+    global_id TEXT,
+    name TEXT,
+    ifc_class TEXT,                       -- IfcBuildingStorey, IfcSpace, dll
+    parent_global_id TEXT                 -- hierarchy tree
+);
+
+ALTER TABLE ifc_element
+ADD COLUMN spatial_id INT REFERENCES ifc_spatial_structure(id);
+
+
+CREATE TABLE ifc_material (
+    id SERIAL PRIMARY KEY,
+    element_id INT REFERENCES ifc_element(id) ON DELETE CASCADE,
+    material_name TEXT,
+    layer_name TEXT,
+    thickness DOUBLE PRECISION
+);
+
+
+CREATE TABLE ifc_element_version (
+    id SERIAL PRIMARY KEY,
+    element_global_id TEXT,
+    file_id INT REFERENCES ifc_file(id),
+    version INT,
+    change_type TEXT,                      -- added, modified, deleted
+    changed_at TIMESTAMP DEFAULT NOW()
+);
+
+
