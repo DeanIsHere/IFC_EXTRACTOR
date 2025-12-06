@@ -1,3 +1,4 @@
+
 CREATE TABLE ifc_file (
     id SERIAL PRIMARY KEY,
     guid UUID NOT NULL,

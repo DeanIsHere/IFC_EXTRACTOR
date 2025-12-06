@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 
 from handlers.MinioHandler import MinioStorageAdapter
 from service.IFCService import IFCService
-from adapters.IFCHandler import create_ifc_blueprint
+from adapters.IFCAdapter import create_ifc_blueprint
 
 from config import config
 

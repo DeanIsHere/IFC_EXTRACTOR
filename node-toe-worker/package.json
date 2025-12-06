@@ -1,0 +1,11 @@
+{
+  "name": "ifc-worker",
+  "version": "1.0.0",
+  "main": "app.js",
+  "type": "commonjs",
+  "dependencies": {
+    "kafkajs": "^2.2.4",
+    "minio": "^8.0.0",
+    "dotenv": "^16.4.5"
+  }
+}
